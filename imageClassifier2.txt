@@ -1,0 +1,36 @@
+implementation 'com.google.mlkit:image-labeling:17.0.1'
+implementation 'com.google.mlkit:image-labeling-custom:16.3.1'
+aaptOptions{
+    noCompress "tflite"
+}
+val localModel = LocalModel.Builder()
+        .setAssetFilePath("model.tflite")
+        .build()
+val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+val options = CustomImageLabelerOptions.Builder(localModel)
+        .setConfidenceThreshold(0.7f)
+        .setMaxResultCount(5)
+        .build()
+val labeler = ImageLabeling.getClient(options)
+platform :ios, '10.0'
+
+target 'ImageClassifierStep1' do
+        pod 'GoogleMLKit/ImageLabeling'
+end
+platform :ios, '10.0'
+
+target 'ImageClassifierStep1' do
+        pod 'GoogleMLKit/ImageLabelingCustom'
+end
+
+
+
+import MLKitVision
+import MLKit
+import MLKitImageLabelingCommon
+import MLKitImageLabelingCustom
+// Add this code to use a custom model
+let localModelFilePath = Bundle.main.path(forResource: "model", ofType: "tflite")
+let localModel = LocalModel(path: localModelFilePath!)
+let options = ImageLabelerOptions()
+let options = CustomImageLabelerOptions(localModel: localModel)

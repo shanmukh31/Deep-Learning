@@ -1,0 +1,59 @@
+# Install Model maker
+!pip install -q tflite-model-maker &> /dev/null
+# Imports and check that we are using TF2.x
+import numpy as np
+import os
+
+from tflite_model_maker import configs
+from tflite_model_maker import ExportFormat
+from tflite_model_maker import model_spec
+from tflite_model_maker import image_classifier
+from tflite_model_maker.image_classifier import DataLoader
+
+import tensorflow as tf
+assert tf.__version__.startswith('2')
+tf.get_logger().setLevel('ERROR')
+data_path = tf.keras.utils.get_file(
+      'flower_photos',
+      'https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz',
+      untar=True)
+data = DataLoader.from_folder(data_path)
+train_data, test_data = data.split(0.9)
+model = image_classifier.create(train_data)
+Model: "sequential_2"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+hub_keras_layer_v1v2_2 (HubK (None, 1280)              3413024
+_________________________________________________________________
+dropout_2 (Dropout)          (None, 1280)              0
+_________________________________________________________________
+dense_2 (Dense)              (None, 5)                 6405
+=================================================================
+Total params: 3,419,429
+Trainable params: 6,405
+Non-trainable params: 3,413,024
+_________________________________________________________________
+None
+Epoch 1/5
+103/103 [===] - 15s 129ms/step - loss: 1.1169 - accuracy: 0.6181
+
+Epoch 2/5
+103/103 [===] - 13s 126ms/step - loss: 0.6595 - accuracy: 0.8911
+
+Epoch 3/5
+103/103 [===] - 13s 127ms/step - loss: 0.6239 - accuracy: 0.9133
+
+Epoch 4/5
+103/103 [===] - 13s 128ms/step - loss: 0.5994 - accuracy: 0.9287
+
+Epoch 5/5
+103/103 [===] - 13s 126ms/step - loss: 0.5836 - accuracy: 0.9385
+
+hub_keras_layer_v1v2_2 (HubK (None, 1280)              3413024
+
+loss, accuracy = model.evaluate(test_data)
+
+12/12 [===] - 5s 115ms/step - loss: 0.6622 - accuracy: 0.8801
+
+model.export(export_dir='/mm_flowers')
